@@ -1,49 +1,37 @@
 class Solution {
-    long sqr(long x) {
-        return x * x;
-    }
-
     public long findMaximumElegance(int[][] items, int k) {
-        final int n = items.length;
-        Integer[] ind = new Integer[n];
-        for (int i = 0; i < n; ++i) {
-            ind[i] = i;
-        }
-        Arrays.sort(ind, new Comparator<Integer>() {
-            @Override
-            public int compare(Integer x, Integer y) {
-                return Integer.compare(items[y][0], items[x][0]);
+        long ans = 0;
+        Arrays.sort(items, (a,b)-> b[0]-a[0]);
+        Set<Integer> categoriesSeen = new HashSet<>();
+        List<Integer> duplicateCategories = new ArrayList<>();
+        for(int i=0;i<k;i++){
+            ans += items[i][0];
+            int currCat = items[i][1];
+            if(categoriesSeen.contains(currCat)){
+                duplicateCategories.add(items[i][0]);
+            }else{
+                categoriesSeen.add(currCat);
             }
-        });
-        Map<Integer, Integer> num = new HashMap<>();
-        PriorityQueue<Pair<Integer, Integer>> q = new PriorityQueue<>(new Comparator<Pair<Integer, Integer>>() {
-            @Override
-            public int compare(Pair<Integer, Integer> p1, Pair<Integer, Integer> p2) {
-                return Integer.compare(p2.getKey(), p1.getKey());
-            }
-        });
-        long v = 0;
-        for (int i = 0; i < k; ++i) {
-            v += items[ind[i]][0];
-            num.put(items[ind[i]][1], num.getOrDefault(items[ind[i]][1], 0) + 1);
-            q.add(new Pair<>(-items[ind[i]][0], ind[i]));
         }
-        long r = v + sqr(num.size());
-        for (int i = k; i < n && !q.isEmpty(); ++i) {
-            if (num.containsKey(items[ind[i]][1])) {
+        long curr = ans;
+        ans += 1L*categoriesSeen.size()*categoriesSeen.size();
+        
+        int n = items.length;
+        for(int i=k;i<n;i++){
+            int currCat = items[i][1];
+            int currVal = items[i][0];
+            
+            if(categoriesSeen.contains(currCat)){
                 continue;
             }
-            int x = q.peek().getValue();
-            q.poll();
-            if (num.get(items[x][1]) == 1) {
-                --i;
-                continue;
+            if(duplicateCategories.size()==0){
+                break;
             }
-            v += items[ind[i]][0] - items[x][0];
-            num.put(items[x][1], num.get(items[x][1]) - 1);
-            num.put(items[ind[i]][1], num.getOrDefault(items[ind[i]][1], 0) + 1);
-            r = Math.max(r, v + sqr(num.size()));
+            curr += currVal - duplicateCategories.get(duplicateCategories.size()-1);
+            duplicateCategories.remove(duplicateCategories.size()-1);
+            categoriesSeen.add(currCat);
+            ans = Math.max(ans, curr + 1L*categoriesSeen.size()*categoriesSeen.size());
         }
-        return r;
+        return ans;
     }
 }
