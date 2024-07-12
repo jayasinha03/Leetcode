@@ -1,21 +1,26 @@
 class Solution {
-    public int minimumSum(int []nums) {
-        int sz = nums.length;
-        int minLeft[] = new int[sz];
-        int minRight[] = new int[sz];
-        for(int indx = 0; indx < sz; indx++){
-            minLeft[indx] = Math.min((indx - 1 > -1) ? minLeft[indx-1] : Integer.MAX_VALUE, nums[indx]);
+    public int minimumSum(int[] nums) {
+        int n=nums.length;
+        int[] l=new int[n];
+        int[] r=new int[n];
+        l[0]=nums[0];
+        r[n-1]=nums[n-1];
+        for(int i=1;i<n;i++){
+            l[i]=Math.min(l[i-1],nums[i]);
         }
-        for(int indx = sz - 1; indx >= 0; indx--){
-            minRight[indx] =  Math.min((indx + 1 < sz) ? minRight[indx + 1] : Integer.MAX_VALUE, nums[indx]);
+
+        for(int i=n-2; i>=0; i--){
+            r[i]=Math.min(r[i+1],nums[i]);
         }
-        int minSum = Integer.MAX_VALUE;
-        for(int indx = 1; indx < sz-1; indx++){
-            if(minLeft[indx-1] >= nums[indx] || minRight[indx+1] >= nums[indx])continue;
-            int leftValue = minLeft[indx - 1];
-            int rightValue = minRight[indx+1];
-            minSum = Math.min(minSum, nums[indx] + rightValue + leftValue);
+
+        int min=Integer.MAX_VALUE;
+        for(int i=1;i<n-1;i++){
+            if(l[i]<nums[i] && r[i]< nums[i]){
+                int sum=l[i]+nums[i]+r[i];
+                min=Math.min(sum,min);
+            }
         }
-        return minSum == Integer.MAX_VALUE ? - 1 : minSum;
+        return (min==Integer.MAX_VALUE)?-1:min;
+
     }
 }
